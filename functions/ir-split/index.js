@@ -1,9 +1,19 @@
 const AWS = require("aws-sdk");
+const fs = require('fs')
+const path = './config.json'
+
+try {
+  if (fs.existsSync(path)) {
+    AWS.config.loadFromPath('./config.json');
+  }
+} catch(err) {
+  console.error(err)
+}
+
 const s3 = new AWS.S3();
 
-exports.handler = async (event) => {
-  const body = JSON.parse(event.body);
 
+async function ir_split(body) {
   const s3bucket = body["s3bucket"];
   const desired_num_splits = body["desired_num_splits"];
   const s3prefix = body["s3prefix"];
@@ -36,13 +46,24 @@ exports.handler = async (event) => {
   batches.push(currBatch);
 
   const numBatches = batches.length;
+  return {
+    numBatches: numBatches, 
+    batches: batches
+};  
+}
 
-  const response = {
+//AWS CALL
+exports.handler = async (event) => {  
+  const body = JSON.parse(event.body);
+  result = await ir_split(body)
+  return {
     statusCode: 200,
     body: JSON.stringify({
-      num_batches: numBatches,
-      batches: batches,
+      num_batches: result.numBatches,
+      batches: result.batches,
     }),
   };
-  return response;
 };
+
+//IBM
+exports.main = ir_split;

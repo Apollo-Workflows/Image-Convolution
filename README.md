@@ -49,7 +49,7 @@ Then, update `input.json` with the desired parallelism. The default is 2. This y
    - AWS: Put credential file under `aws/credentials`
    - IBM:
      - Add `ibmcloud_api_key` to `ibm/terraform.tfvars`
-     - Add S3 credentials from AWS to `ibm/s3Credentials`
+     - Add S3 credentials from AWS to `ibm/s3Credentials.json`
 2. 
    - A: Deploy to all providers:
         Run from root dir `docker run --rm -it --entrypoint=/app/deployAll.sh -v ${PWD}:/app/ chrisengelhardt/apollo-autodeploy`
@@ -69,3 +69,9 @@ Commands:
         --url                   Prints out all deployment urls
         --mappings              Creates typeMapping.json with the deployment urls
 ```
+
+# Run the containers
+
+To run the containers (preprocess-imgs, ir-split, ir-convolution.-educe) you must mount your input and credentials file into the correct dir as shown below:
+
+`docker run --rm -it -v ${PWD}/input.json:/usr/src/app/input.json -v ${PWD}/credentials:/root/.aws/credentials ir-preprocess`
